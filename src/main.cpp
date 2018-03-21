@@ -16,6 +16,7 @@ const std::string kDefaultFileTemplate = R"(
 #define {INCLUDE_GUARD_NAME}
 
 #include <Meta.h>
+{INCLUDES}
 
 namespace meta {{
 {META_IMPL}
@@ -41,8 +42,7 @@ struct Struct {
 };
 
 std::string randomHeaderName() {
-    std::string const default_chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    std::string const default_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
     const auto len = 10;
     std::mt19937_64 gen{std::random_device()()};
@@ -116,18 +116,24 @@ class StructDeclFrontendAction : public clang::ASTFrontendAction {
     }
 };
 
-int main(int argc, const char* argv[]) {
-    llvm::cl::OptionCategory ms_generator{"metastuff-generator options"};
+static llvm::cl::OptionCategory ms_generator{"metastuff-generator options"};
+static llvm::cl::extrahelp CommonHelp(
+    clang::tooling::CommonOptionsParser::HelpMessage);
+static llvm::cl::extrahelp MoreHelp("\nMore help text...");
+static llvm::cl::opt<std::string> option{
+    "template-file", llvm::cl::desc("path to template file"),
+    llvm::cl::value_desc("filename"), llvm::cl::cat(ms_generator)};
 
+int main(int argc, const char* argv[]) {
     clang::tooling::CommonOptionsParser opts{argc, argv, ms_generator};
 
-    clang::tooling::ClangTool tool{opts.getCompilations(),
-                                   opts.getSourcePathList()};
+    const auto files = opts.getSourcePathList();
+    clang::tooling::ClangTool tool{opts.getCompilations(), files};
 
     auto ec = tool.run(
         clang::tooling::newFrontendActionFactory<StructDeclFrontendAction>()
             .get());
-    std::string buff;
+    std::string buff, includeBuff;
     for (const auto& oneEntry : data) {
         using namespace fmt;
         buff += fmt::format(kDefaultSpecializationTemplate,
@@ -136,11 +142,16 @@ int main(int argc, const char* argv[]) {
         buff += "\n";
     }
 
-
     using namespace fmt;
+    // includes
+    {
+        for (const auto& f : files) {
+            includeBuff += fmt::format("#include <{}>\n", f);
+        }
+    }
     std::cout << fmt::format(kDefaultFileTemplate,
                              "INCLUDE_GUARD_NAME"_a = randomHeaderName(),
-                             "META_IMPL"_a = buff)
+                             "META_IMPL"_a = buff, "INCLUDES"_a = includeBuff)
               << std::endl;
 
     return ec;
