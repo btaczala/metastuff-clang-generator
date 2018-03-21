@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/Frontend/CompilerInstance.h"
@@ -38,6 +39,20 @@ struct Struct {
     std::string name;
     std::string memberTemplatesFilled;
 };
+
+std::string randomHeaderName() {
+    std::string const default_chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+
+    const auto len = 10;
+    std::mt19937_64 gen{std::random_device()()};
+    std::uniform_int_distribution<size_t> dist{0, default_chars.length() - 1};
+    std::string ret;
+    std::generate_n(std::back_inserter(ret), len,
+                    [&] { return default_chars[dist(gen)]; });
+    ret += "_H";
+    return ret;
+}
 
 std::vector<Struct> data;
 }  // namespace
@@ -121,9 +136,10 @@ int main(int argc, const char* argv[]) {
         buff += "\n";
     }
 
+
     using namespace fmt;
     std::cout << fmt::format(kDefaultFileTemplate,
-                             "INCLUDE_GUARD_NAME"_a = "TEST",
+                             "INCLUDE_GUARD_NAME"_a = randomHeaderName(),
                              "META_IMPL"_a = buff)
               << std::endl;
 
