@@ -1,16 +1,16 @@
 
-add_executable(metastuff-generator
+add_executable(metastuff-clang-generator
     main.cpp
 )
 
-target_compile_definitions(metastuff-generator PRIVATE __STDC_LIMIT_MACROS __STDC_CONSTANT_MACROS)
-target_link_libraries(metastuff-generator fmt)
-target_link_libraries(metastuff-generator
+target_compile_definitions(metastuff-clang-generator PRIVATE __STDC_LIMIT_MACROS __STDC_CONSTANT_MACROS)
+target_link_libraries(metastuff-clang-generator fmt)
+target_link_libraries(metastuff-clang-generator
     clangFrontend clangSerialization clangDriver clangParse clangRewriteFrontend clangStaticAnalyzerFrontend clangSema
     clangAnalysis clangEdit clangAST clangLex clangBasic clangTooling
     clangRewrite clangASTMatchers clangToolingCore)
 
-target_link_libraries(metastuff-generator 
+target_link_libraries(metastuff-clang-generator 
     LLVMX86AsmParser
     LLVMX86Desc # MC, Support, X86AsmPrinter, X86Info
     LLVMX86AsmPrinter # MC, Support, X86Utils
@@ -30,3 +30,6 @@ target_link_libraries(metastuff-generator
     LLVMCore # Support
     LLVMSupport
 )
+
+install(TARGETS metastuff-clang-generator
+    RUNTIME DESTINATION bin)
