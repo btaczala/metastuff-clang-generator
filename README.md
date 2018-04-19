@@ -6,11 +6,11 @@ Clang based generator for [MetaStuff](https://github.com/eliasdaler/MetaStuff)
 
 # Building
 For building you need to have llvm & clang installed then standard cmake stuff: 
-```
 $ git clone https://github.com/w0land/metastuff-clang-generator.git
 $ cd metastuff-clang-generator
-$ mkdir build
-$ cmake .. 
+$ mkdir build && cd build
+$ cmake ..
+$ cmake --build . --config Release
 ```
 
 # Usage
