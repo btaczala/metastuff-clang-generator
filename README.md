@@ -6,6 +6,7 @@ Clang based generator for [MetaStuff](https://github.com/eliasdaler/MetaStuff)
 
 # Building
 For building you need to have llvm & clang installed then standard cmake stuff: 
+```
 $ git clone https://github.com/w0land/metastuff-clang-generator.git
 $ cd metastuff-clang-generator
 $ mkdir build && cd build
@@ -16,6 +17,7 @@ $ cmake --build . --config Release
 # Usage
 To properly use this on actual headers you need a bit of fine tunning: you need to figure out where default includes are for clang and pass them to metastuff-clang-generator
  command line. See example: 
+ 
  ```
  $ cd build/
  $ ./src/metastuff-generator ~/main.cpp -- -I/usr/lib/clang/5.0.1/include -std=c++14
@@ -108,7 +110,4 @@ metastuff-generator options:
 	working directory. "./" prefixes in the relative files will be
 	automatically removed, but the rest of a relative path must be a
 	suffix of a path in the compile command database.
-
-
-More help text...
 ```
